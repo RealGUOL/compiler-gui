@@ -63,8 +63,10 @@
 
 
 
+#include <stdio.h>   
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 #include "code.h"
 #include <malloc.h>
 void yyerror(char*);
@@ -188,17 +190,17 @@ static const short yyrhs[] = {    -1,
 
 #if YYDEBUG != 0
 static const short yyrline[] = { 0,
-    54,    61,    62,    72,    75,    78,    80,    83,    90,    96,
-   102,   110,   114,   117,   143,   149,   155,   157,   158,   159,
-   162,   183,   185,   188,   190,   191,   192,   193,   194,   196,
-   197,   198,   199,   200,   201,   204,   208,   221,   234,   243,
-   246,   269,   271,   274,   276,   279,   281,   284,   288,   296,
-   318,   322,   330,   352,   367,   371,   376,   380,   384,   389,
-   397,   400,   422,   426,   449,   467,   470,   496,   500,   502,
-   505,   516,   524,   527,   529,   532,   535,   538,   541,   544,
-   547,   550,   553,   581,   583,   586,   591,   595,   598,   601,
-   604,   607,   612,   614,   646,   659,   672,   685,   698,   709,
-   722
+    56,    63,    64,    74,    77,    80,    82,    85,    92,    98,
+   104,   112,   116,   119,   145,   151,   157,   159,   160,   161,
+   164,   185,   187,   190,   192,   193,   194,   195,   196,   198,
+   199,   200,   201,   202,   203,   206,   210,   223,   236,   245,
+   248,   271,   273,   276,   278,   281,   283,   286,   290,   298,
+   320,   324,   332,   354,   369,   373,   378,   382,   386,   391,
+   399,   402,   424,   428,   451,   469,   472,   498,   502,   504,
+   507,   518,   526,   529,   531,   534,   537,   540,   543,   546,
+   549,   552,   555,   583,   585,   588,   593,   597,   600,   603,
+   606,   609,   614,   616,   648,   661,   674,   687,   700,   711,
+   724
 };
 #endif
 
@@ -1865,40 +1867,46 @@ yyerrhandle:
 void yyerror(char *s){
     err++;
     printf("%s in line %d\n",s,line);
-    fprintf(fa1,"%s in line %d\n",s,line);
+    fprintf(ferrout,"%s in line %d\n",s,line);
 }
 
-int cifa()
+int compile(const char* filePath)
 {
     int i;
+    listswitch=true;
     int print_table=1;
-    yyin = fopen("test.x0","r");
+    yyin = fopen(filePath,"r");
+
     printf("x0 compiler\n");
-    if((fa1=fopen("fa1.txt","w"))==NULL){
+    if((ferrout=fopen("ferrout.txt","w"))==NULL){
         printf("Cann't open file!\n");
         exit(0);
-        }
-    if((fa=fopen("fa.txt","w"))==NULL){
-        printf("Cann't open fa.txt file!\n");
+    }
+    if((fcode=fopen("fcode.txt","w"))==NULL){
+        printf("Cann't open fcode.txt file!\n");
         exit(0);
     }
-    if((fa2=fopen("fa2.txt","w"))==NULL){
-        printf("Cann't open fa2.txt file!\n");
+    if((fresult=fopen("fresult.txt","w"))==NULL){
+        printf("Cann't open fresult.txt file!\n");
+        exit(0);
+    }
+    if((ftable=fopen("ftable.txt","w"))==NULL){
+        printf("Cann't open ftable.txt file!\n");
         exit(0);
     }
     yyparse();
-    fclose(fa);
-    fclose(fa1);
     if(err==0)
     {
         listcode();
         interpret();
     }
-    
     else
         printf("%d errors in PL/0 program\n",err);
     if(print_table){
         printTable(0);
     }
+    fclose(fcode);
+    fclose(ferrout);
+    fclose(ftable);
     return 0;
 }

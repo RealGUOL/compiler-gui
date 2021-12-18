@@ -1,9 +1,6 @@
 #include "mainwindow.h"
 #include <QApplication>
-extern "C" {
-#include "finalcompiler.tab.h"
-}
-
+#include <stdio.h>
 
 int main(int argc, char *argv[])
 {
@@ -11,7 +8,5 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
     a.exec();
-    cifa();
-
     return 0;
 }

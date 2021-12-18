@@ -4,6 +4,10 @@
 #include <QPushButton>
 #include <QFileDialog>
 #include <QTextStream>
+#include <QPainter>
+extern "C" {
+#include "finalcompiler.tab.h"
+}
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -100,7 +104,7 @@ bool MainWindow::saveFile(const QString &fileName)
    return true;
 }
 
-bool MainWindow::loadFile(const QString &fileName)
+bool MainWindow::loadFile(const QString &fileName, int mode)
 {
    QFile file(fileName); // 新建QFile对象
    if (!file.open(QFile::ReadOnly | QFile::Text)) {
@@ -111,13 +115,24 @@ bool MainWindow::loadFile(const QString &fileName)
    }
    QTextStream in(&file); // 新建文本流对象
    QApplication::setOverrideCursor(Qt::WaitCursor);
-   // 读取文件的全部文本内容，并添加到编辑器中
-   ui->textEdit->setPlainText(in.readAll());      QApplication::restoreOverrideCursor();
-
-   // 设置当前文件
-   curFile = QFileInfo(fileName).canonicalFilePath();
-   setWindowTitle(curFile);
+   if(mode == 0) {
+       // 读取文件的全部文本内容，并添加到编辑器中
+       ui->textEdit->setPlainText(in.readAll());      QApplication::restoreOverrideCursor();
+       // 设置当前文件
+       curFile = QFileInfo(fileName).canonicalFilePath();
+       isUntitled = true;
+       setWindowTitle(curFile);
+   } else if(mode == 1) {
+       ui->result->setPlainText(in.readAll());      QApplication::restoreOverrideCursor();
+   } else if(mode == 2) {
+       ui->code->setPlainText(in.readAll());      QApplication::restoreOverrideCursor();
+   } else if(mode == 3) {
+       ui->symbaltable->setPlainText(in.readAll());      QApplication::restoreOverrideCursor();
+   } else if(mode == 4) {
+       ui->errout->setPlainText(in.readAll());      QApplication::restoreOverrideCursor();
+   }
    return true;
+
 }
 
 void MainWindow::on_action_N_triggered()
@@ -138,7 +153,7 @@ void MainWindow::on_action_O_triggered()
 
         // 如果文件名不为空，则加载文件
         if (!fileName.isEmpty()) {
-             loadFile(fileName);
+             loadFile(fileName, 0);
              ui->textEdit->setVisible(true);
         }
     }
@@ -157,4 +172,39 @@ void MainWindow::on_action_X_triggered()
     // qApp是指向应用程序的全局指针
     on_action_C_triggered();
     qApp->quit();
+}
+
+void MainWindow::on_action_R_triggered()
+{
+    if (maybeSave()) {
+        compile(curFile.toLocal8Bit().data());
+        QString str1 = "T/编译est";
+        const char *c_str2 = str1.toLocal8Bit().data();
+        printf("str1: %s\n", c_str2);
+        fflush(stdout);
+        loadFile("fresult.txt", 1);
+        loadFile("fcode.txt", 2);
+        loadFile("ftable.txt", 3);
+        loadFile("ferrout.txt", 4);
+    }
+}
+
+void MainWindow::paintEvent(QPaintEvent *)
+{
+//    QPainter painter(this);
+//    painter.drawText(100, 100, "qter.org_yafeilinux");
+}
+
+void MainWindow::on_action_C_2_triggered()
+{
+    if (maybeSave()) {
+        compile(curFile.toLocal8Bit().data());
+        QString str1 = "T/编译est";
+        const char *c_str2 = str1.toLocal8Bit().data();
+        printf("str1: %s\n", c_str2);
+        fflush(stdout);
+        loadFile("fcode.txt", 2);
+        loadFile("ftable.txt", 3);
+        loadFile("ferrout.txt", 4);
+    }
 }

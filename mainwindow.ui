@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>625</width>
-    <height>519</height>
+    <width>1289</width>
+    <height>621</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,12 +17,90 @@
    <widget class="QTextEdit" name="textEdit">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>20</y>
-      <width>441</width>
-      <height>351</height>
+      <x>10</x>
+      <y>0</y>
+      <width>1271</width>
+      <height>381</height>
      </rect>
     </property>
+   </widget>
+   <widget class="QTabWidget" name="tabWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>390</y>
+      <width>1271</width>
+      <height>171</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>3</number>
+    </property>
+    <widget class="QWidget" name="tab_2">
+     <attribute name="title">
+      <string>Output</string>
+     </attribute>
+     <widget class="QTextBrowser" name="result">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>1271</width>
+        <height>141</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab">
+     <attribute name="title">
+      <string>Code</string>
+     </attribute>
+     <widget class="QTextBrowser" name="code">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>1271</width>
+        <height>141</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_4">
+     <attribute name="title">
+      <string>Symbol table</string>
+     </attribute>
+     <widget class="QTextBrowser" name="symbaltable">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>1271</width>
+        <height>141</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_5">
+     <attribute name="title">
+      <string>Error</string>
+     </attribute>
+     <widget class="QTextBrowser" name="errout">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>1271</width>
+        <height>141</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_3">
+     <attribute name="title">
+      <string>Data Stack</string>
+     </attribute>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -30,7 +108,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>625</width>
+     <width>1289</width>
      <height>26</height>
     </rect>
    </property>
@@ -49,6 +127,9 @@
     <property name="title">
      <string>运行(&amp;R)</string>
     </property>
+    <addaction name="action_C_2"/>
+    <addaction name="action_R"/>
+    <addaction name="action_D"/>
    </widget>
    <addaction name="menu_F"/>
    <addaction name="menu_R"/>
@@ -90,16 +171,28 @@
    <property name="text">
     <string>关闭(&amp;C)</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+C</string>
-   </property>
   </action>
   <action name="action_X">
    <property name="text">
     <string>退出(&amp;X)</string>
    </property>
+  </action>
+  <action name="action_C_2">
+   <property name="text">
+    <string>编译(&amp;C)</string>
+   </property>
+  </action>
+  <action name="action_R">
+   <property name="text">
+    <string>运行(&amp;R)</string>
+   </property>
    <property name="shortcut">
-    <string>Ctrl+X</string>
+    <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="action_D">
+   <property name="text">
+    <string>调试(&amp;D)</string>
    </property>
   </action>
  </widget>

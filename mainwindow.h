@@ -19,7 +19,10 @@ public:
     bool save();      // 保存操作
     bool saveAs();    // 另存为操作
     bool saveFile(const QString &fileName); // 保存文件
-    bool loadFile(const QString &fileName); // 加载文件
+    bool loadFile(const QString &fileName, int mode); // 加载文件
+
+protected:
+    void paintEvent(QPaintEvent *);
 
 private slots:
     void on_action_N_triggered();
@@ -31,6 +34,10 @@ private slots:
     void on_action_C_triggered();
 
     void on_action_X_triggered();
+
+    void on_action_R_triggered();
+
+    void on_action_C_2_triggered();
 
 private:
     Ui::MainWindow *ui;

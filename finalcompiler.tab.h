@@ -66,4 +66,4 @@ struct databus* db;
 
 extern YYSTYPE yylval;
 
-int cifa();
+int compile(const char* filePath);

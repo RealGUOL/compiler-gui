@@ -9,10 +9,13 @@ enum fct{lit,opr,lod,sto,cal,ini,jmp,jpc,ext};
 enum inloop{brk,ctn};
 char *mnemonic[9]={"lit","opr","lod","sto","cal","ini","jmp","jpc", "ext"};
 
-FILE *fa;
-FILE *fa1,*fa2;
+FILE *fcode;
+FILE *ferrout,*fresult;
 FILE *fin,*fout;
 char fname[AL];
+
+enum listswitcher{false,true};
+enum listswitcher listswitch;
 
 struct instruction{
 	enum fct f;
@@ -44,9 +47,9 @@ struct stack{
 
 void error(int n){
 	printf("***");
-	fputs("***",fa1);
+	fputs("***",ferrout);
 	printf("error%d",n);
-	fprintf(fa1,"error%d",n);
+	fprintf(ferrout,"error%d",n);
 }
 
 void code_error(char * s)
@@ -74,14 +77,17 @@ void gen(enum fct x,int y,int z)
 void listcode( )
 {
 	int i;
-	printf("****************************************************************************************************************************************************\n");
-	printf("pcode:\n");
-	printf("%15s %15s %15s %15s %15s %15s\n","id","f","l","a","isd","d");
-	for(i=0;i<=cx-1;i++){
-		printf("%15d %15s %15d %15d %15d %15lf\n",i,mnemonic[(int)code[i].f],code[i].l,code[i].a,code[i].isd,code[i].d);
-		//fprintf(fa,"%2d	%5s	%3d	%5d\n",i,mnemonic[(int)code[i].f],code[i].l,code[i].a);
+	if(listswitch==true){
+		printf("****************************************************************************************************************************************************\n");
+		printf("pcode:\n");
+		printf("%15s %15s %15s %15s %15s %15s\n","id","f","l","a","isd","d");
+        fprintf(fcode, "%15s %15s %15s %15s %15s %15s\n","id","f","l","a","isd","d");
+		for(i=0;i<=cx-1;i++){
+			printf("%15d %15s %15d %15d %15d %15lf\n",i,mnemonic[(int)code[i].f],code[i].l,code[i].a,code[i].isd,code[i].d);
+            fprintf(fcode, "%15d %15s %15d %15d %15d %15lf\n",i,mnemonic[(int)code[i].f],code[i].l,code[i].a,code[i].isd,code[i].d);
+			}
+		printf("****************************************************************************************************************************************************\n");
 	}
-	printf("****************************************************************************************************************************************************\n");
 }
 
 
@@ -105,7 +111,7 @@ void interpret()
 	/*int s[STACKSIZE];*/
 	struct stack s[STACKSIZE];
 	printf("********Start X0*********\n");
- 	//fprintf(fa1,"********Start PL/0*********\n");
+ 	//fprintf(ferrout,"********Start PL/0*********\n");
 	s[0].vi=0;s[0].vd=0.0;s[0].type=int_t;
 	s[1].vi=0;s[1].vd=0.0;s[1].type=int_t;
 	s[2].vi=0;s[2].vd=0.0;s[2].type=int_t;
@@ -313,28 +319,28 @@ void interpret()
 					case 14:
 						if(s[t].type==double_tt){
 							printf("%lf",s[t].vd);
-							fprintf(fa2,"%lf",s[t].vd);
+							fprintf(fresult,"%lf",s[t].vd);
 						}else{
 							printf("%d",s[t].vi);
-							fprintf(fa2,"%d",s[t].vi);
+							fprintf(fresult,"%d",s[t].vi);
 						}
 						t=t-1;
 						break;
 					case 15:
 						printf("\n");
-						fprintf(fa2,"\n");
+						fprintf(fresult,"\n");
 						break;
 					case 16:
 						t=t+1;
 						s[t].type=int_t;
 						printf("?");
-						fprintf(fa2,"?");
+						fprintf(fresult,"?");
 						if(i.isd){
 							scanf("%lf",&s[t].vd);
-							fprintf(fa2,"%lf",s[t].vd);
+							fprintf(fresult,"%lf",s[t].vd);
 						}else{
 							scanf("%d",&s[t].vi);
-							fprintf(fa2,"%d",s[t].vi);
+							fprintf(fresult,"%d",s[t].vi);
 						}
 						break;
 					case 17:	/*写字符*/
@@ -342,7 +348,7 @@ void interpret()
 							code_error("top of the stack is a double so that we cannot write a charater.");
 						}
 						printf("%c",s[t].vi);
-						fprintf(fa2,"%c",s[t].vi);
+						fprintf(fresult,"%c",s[t].vi);
 						t=t-1;
 						break;
 					case 18:	/*写栈顶值所在的数据单元int*/
@@ -351,10 +357,10 @@ void interpret()
 						}
 						if(s[s[t].vi].type==double_tt){
 							printf("%lf",s[s[t].vi].vd);
-							fprintf(fa2,"%lf",s[s[t].vi].vd);
+							fprintf(fresult,"%lf",s[s[t].vi].vd);
 						}else{
 							printf("%d",s[s[t].vi].vi);
-							fprintf(fa2,"%d",s[s[t].vi].vi);
+							fprintf(fresult,"%d",s[s[t].vi].vi);
 						}
 						t=t-1;
 						break;
@@ -366,7 +372,7 @@ void interpret()
 							code_error("adr of the stack is a double so that we cannot write a charater.");
 						}
 						printf("%c",s[s[t].vi].vi);
-						fprintf(fa2,"%c",s[s[t].vi].vi);
+						fprintf(fresult,"%c",s[s[t].vi].vi);
 						t=t-1;
 						break;
 					case 20:	/*MOD*/
@@ -408,7 +414,7 @@ void interpret()
 							code_error("tops of the stack are doubles so that one cannot be writen.");
 						}
 						printf("%s",s[t].vi==0?"false":"true");
-						fprintf(fa2,"%s",s[t].vi==0?"false":"true");
+						fprintf(fresult,"%s",s[t].vi==0?"false":"true");
 						t=t-1;
 						break;
 					case 26: /*pop stack*/
@@ -526,5 +532,5 @@ void interpret()
 			}
 		}while(p!=0);
 		printf("\n********End X0***********\n");
-		fclose(fa2);
+		fclose(fresult);
 }

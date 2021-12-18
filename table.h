@@ -5,8 +5,9 @@
 #define AL 20
 #define LEVMAX 3
 #define AMAX 65535
-#define STACKSIZE 100000
+#define STACKSIZE 1000
 
+FILE *ftable;
 int lev=0;
 int tx=0;
 int dx=0;
@@ -222,7 +223,8 @@ void printTable(int tofile)
 	printf("****************************************************************************************************************************************************\n");
 	printf("table:\n");
 	printf("%15s%15s%15s%15s%15s%15s%15s%15s%15s%15s\n", "name", "kind", "val", "val_d", "type", "adr", "size", "array", "array_dim", "array_size");
-	for(i=0;i<=tx;i++)
+    fprintf(ftable, "%15s%15s%15s%15s%15s%15s%15s%15s%15s%15s\n", "name", "kind", "val", "val_d", "type", "adr", "size", "array", "array_dim", "array_size");
+    for(i=0;i<=tx;i++)
 	{
 		switch(table[i].kind)
 		{
@@ -257,6 +259,7 @@ void printTable(int tofile)
 		char ss[50];
 		list_prints(table[i].array_size,ss);
 		printf("%15s%15s%15d%15lf%15s%15d%15d%15d%15d%15s\n", table[i].name, kind, table[i].val, table[i].val_d, type, table[i].adr, table[i].size, table[i].array, table[i].array_dim, ss);
-	}
+        fprintf(ftable, "%15s%15s%15d%15lf%15s%15d%15d%15d%15d%15s\n", table[i].name, kind, table[i].val, table[i].val_d, type, table[i].adr, table[i].size, table[i].array, table[i].array_dim, ss);
+    }
 	printf("****************************************************************************************************************************************************\n");
 }
