@@ -29,14 +29,14 @@ struct instruction{
 };
 struct instruction code[CXMAX+1];  // 存放虚拟机代码的数组
 
-struct loop{                       // 存放循环
-	int cx;
-	enum inloop type;
-	int level;
+struct loop{                       // 存放循环信息
+	int cx;                          // 记录本层循环代码段开始地址
+	enum inloop type;                // 记录跳出循环类型
+	int level;                       // 记录循环层级
 };
 struct loop loopReg[LOOPMAX];
-int loop_pos=0;
-int loop_level=0;
+int loop_pos=0;                     // 记录总循环数                  
+int loop_level=0;                   // 记录当前所处循环层级
 
 int become_level=0;
 int pop_stack=0;

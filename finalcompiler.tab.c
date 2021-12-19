@@ -191,16 +191,16 @@ static const short yyrhs[] = {    -1,
 #if YYDEBUG != 0
 static const short yyrline[] = { 0,
     56,    63,    64,    74,    77,    80,    82,    85,    92,    98,
-   104,   112,   116,   119,   145,   151,   157,   159,   160,   161,
-   164,   185,   187,   190,   192,   193,   194,   195,   196,   198,
-   199,   200,   201,   202,   203,   206,   210,   223,   236,   245,
-   248,   271,   273,   276,   278,   281,   283,   286,   290,   298,
-   320,   324,   332,   354,   369,   373,   378,   382,   386,   391,
-   399,   402,   424,   428,   451,   469,   472,   498,   502,   504,
-   507,   518,   526,   529,   531,   534,   537,   540,   543,   546,
-   549,   552,   555,   583,   585,   588,   593,   597,   600,   603,
-   606,   609,   614,   616,   648,   661,   674,   687,   700,   711,
-   724
+   104,   112,   116,   119,   141,   148,   154,   156,   157,   158,
+   161,   182,   184,   187,   189,   190,   191,   192,   193,   195,
+   196,   197,   198,   199,   200,   203,   207,   220,   233,   242,
+   245,   268,   270,   273,   275,   278,   280,   283,   287,   295,
+   317,   321,   329,   351,   366,   370,   375,   379,   383,   388,
+   396,   399,   421,   425,   448,   466,   469,   495,   499,   501,
+   504,   515,   523,   526,   528,   531,   534,   537,   540,   543,
+   546,   549,   552,   580,   582,   585,   590,   594,   597,   600,
+   603,   606,   611,   613,   645,   658,   671,   684,   697,   708,
+   721
 };
 #endif
 
@@ -956,39 +956,39 @@ case 6:
     break;}
 case 8:
 {
-                                                type=int_t;
-                                                strcpy(id,yyvsp[-3].ident);
-                                                num=yyvsp[-1].number;
-                                                enter(constant);
+                                                type=int_t;         /* 整型标识符 */
+                                                strcpy(id,yyvsp[-3].ident);      /* 获得标识符的名字 */
+                                                num=yyvsp[-1].number;             /* 记录标识符的值 */
+                                                enter(constant);    /* 进入符号表 */
                                             ;
     break;}
 case 9:
 {
-                                                    type=double_tt;
-                                                    strcpy(id,yyvsp[-3].ident);
-                                                    num_d=yyvsp[-1].number_d;
-                                                    enter(constant);
+                                                    type=double_tt; /* 浮点型标识符 */
+                                                    strcpy(id,yyvsp[-3].ident);  /* 获得标识符的名字 */
+                                                    num_d=yyvsp[-1].number_d;       /* 记录标识符的值 */
+                                                    enter(constant);/* 进入符号表 */
                                                 ;
     break;}
 case 10:
 {
-                                                type=char_t;
-                                                strcpy(id,yyvsp[-3].ident);
-                                                num=yyvsp[-1].number;
-                                                enter(constant);
+                                                type=char_t;        /* char型标识符 */
+                                                strcpy(id,yyvsp[-3].ident);      /* 获得标识符的名字 */
+                                                num=yyvsp[-1].number;             /* 记录标识符的值 */
+                                                enter(constant);    /* 进入符号表 */
                                             ;
     break;}
 case 11:
 {
-                                                type=bool_t;
-                                                strcpy(id,yyvsp[-3].ident);
-                                                num=yyvsp[-1].number;
-                                                enter(constant);
+                                                type=bool_t;        /* 布尔型标识符 */
+                                                strcpy(id,yyvsp[-3].ident);      /* 获得标识符的名字 */
+                                                num=yyvsp[-1].number;             /* 记录标识符的值 */
+                                                enter(constant);    /* 进入符号表 */
                                             ;
     break;}
 case 12:
 {
-                                            procReg.dx0=dx;
+                                            procReg.dx0=dx;          /* 记录当前数据分配的相对地址 */
                                         ;
     break;}
 case 13:
@@ -996,6 +996,7 @@ case 13:
     break;}
 case 14:
 {
+                                        /* 记录ID的类型 */
                                         if(strcmp(yyvsp[-3].type,"int")==0){
                                             type=int_t;
                                         } else if(strcmp(yyvsp[-3].type,"char")==0){
@@ -1008,21 +1009,17 @@ case 14:
                                             type=none_t;
                                         }
 
-                                        if(array==1){
-                                            strcpy(id,yyvsp[-2].ident);
-                                            enter(variable);
-                                        }else
-                                        {
-                                            strcpy(id,yyvsp[-2].ident);
-                                            enter(variable);
-                                        }
+                                        /* 进入符号表 */
+                                        strcpy(id,yyvsp[-2].ident);
+                                        enter(variable);
                                         type=none_t;
                                     ;
     break;}
 case 15:
 {
-                                                array=1;
-                                                array_dim++;
+                                                array=1;        /* array=1，表明是数组 */
+                                                array_dim++;    /* 记录维度 */
+                                                /* 记录每个维度大小 */
                                                 array_size=list_add(array_size,yyvsp[-1].number);
                                             ;
     break;}
@@ -1047,7 +1044,7 @@ case 20:
     break;}
 case 21:
 {
-            int i = position (yyvsp[0].ident);
+            int i = position (yyvsp[0].ident);    /* 符号表中查找变量 */
             if(i<=0){
                 char s[50];
                 sprintf(s,"variable %s undefined!", yyvsp[0].ident);
@@ -1111,10 +1108,10 @@ case 37:
                         if(loop_pos>=LOOPMAX){
                             syntax_error("too many breaks or continues.");
                         }
-                        loopReg[loop_pos].cx=cx;
-                        loopReg[loop_pos].type=brk;
+                        loopReg[loop_pos].cx=cx;    /* 记录当前层代码开始地址 */
+                        loopReg[loop_pos].type=brk; /* 记录是否跳出循环 */
                         loopReg[loop_pos].level=loop_level;
-                        gen(jmp,0,0);
+                        gen(jmp,0,0);  /* 产生跳转指令，跳转位置未知添0 */
                     ;
     break;}
 case 38:
@@ -1126,7 +1123,7 @@ case 38:
                                 loopReg[loop_pos].cx=cx;
                                 loopReg[loop_pos].type=ctn;
                                 loopReg[loop_pos].level=loop_level;
-                                gen(jmp,0,0);
+                                gen(jmp,0,0);/* 产生跳转指令，跳转位置未知填0 */
                             ;
     break;}
 case 39:
@@ -1155,10 +1152,10 @@ case 41:
                                                 if(loopReg[i].level==loop_level){
                                                     switch(loopReg[i].type){
                                                         case brk:
-                                                            code[loopReg[i].cx].a=cx;
+                                                            code[loopReg[i].cx].a=cx;  /*跳转地址回填*/
                                                             break;
                                                         case ctn:
-                                                            code[loopReg[i].cx].a=yyvsp[-6].number+2;
+                                                            code[loopReg[i].cx].a=yyvsp[-6].number+2; /*跳转地址回填*/
                                                             break;
                                                     }
                                                 }
