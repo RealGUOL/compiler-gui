@@ -67,7 +67,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include "code.h"
+#include "x0code.h"
 #include <malloc.h>
 void yyerror(char*);
 void syntax_error(char* s);

@@ -32,9 +32,9 @@ SOURCES += \
 
 HEADERS += \
         mainwindow.h \
-    code.h \
     finalcompiler.tab.h \
-    table.h
+    x0code.h \
+    x0table.h
 
 FORMS += \
         mainwindow.ui

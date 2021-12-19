@@ -1,4 +1,4 @@
-#include "table.h"
+#include "x0table.h"
 #define CXMAX 1000
 #define LOOPMAX 50
 
