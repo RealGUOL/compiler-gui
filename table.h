@@ -7,14 +7,14 @@
 #define AMAX 65535
 #define STACKSIZE 1000
 
-FILE *ftable;
-int lev=0;
-int tx=0;
-int dx=0;
-int num;
-double num_d;
+FILE *ftable;      // 输出符号表
+int lev = 0;       // 当前程序所在层
+int tx=0;          // 符号表当前尾指针
+int dx=0;          // 记录数据分配的相对地址
+int num;           // 当前number
+double num_d;      // 当前number
 int size;
-int array;
+int array;         // 当前标识符是否是数组
 struct list* array_size;
 int array_dim;
 char id[AL];
@@ -24,6 +24,7 @@ struct list{
     int v;
     struct list *next;
 };
+// 符号表中的类型
 enum object{constant,variable,procedur};
 enum type_e{int_t,char_t, double_tt, bool_t, none_t};
 enum object kind;
@@ -37,22 +38,27 @@ void syntax_error(char* s){
     exit(1);
 }
 struct table1{
-	char name[AL];
-	enum object kind;
-	enum type_e type;
-	int val,adr,size,array,array_dim;
-	double val_d;
-	struct list* array_size;
+	char name[AL];                     // 名字
+	enum object kind;                  // 类型：const，var或procedure
+	enum type_e type;                  // 具体类型
+	int val;                           // 数值，仅const使用
+	int adr;                           // 地址，仅const不使用，如果kind=var，则表示变量在堆栈中的地址；如果kind=procedure，则表示过程在程序地址
+	int size;                          // 需要分配的数据区空间, 仅procedure使用
+	int array;                         // 当前符号是否是数组
+	int array_dim;                     // array 维度
+	double val_d;                      // 数值，仅const使用
+	struct list* array_size;           // 记录多维数组每一维度大小
 	};
-struct table1 table[TXMAX+1];
+struct table1 table[TXMAX+1];        // 符号表
 
 struct procReg1{
 int dx0;
-int tx0;
+int tx0;                             // tx0记录本层标识符的初始位置
 int cx0;
 };
 struct procReg1 procReg;
 
+// 获取array的len
 int array_len(struct list* head)
 {
 	struct list* each = head;
@@ -67,6 +73,8 @@ int array_len(struct list* head)
 	}
 	return len;
 }
+
+// 获取array的最后一个元素
 int list_get_last(struct list* head)
 {
 	if(head==NULL){
@@ -77,15 +85,16 @@ int list_get_last(struct list* head)
 	while(each->next!=NULL)
 		each = each->next;
 	return each->v;
-
 }
+
+// 删除array的最后一个元素
 int list_del_last(struct list* head)
 {
 	if(head==NULL){
 		return 0;
 	}
 	struct list* each = head;
-	struct list* befor=head;
+	struct list* befor = head;
 	while(each->next!=NULL){
 		befor=each;
 		each = each->next;
@@ -94,8 +103,9 @@ int list_del_last(struct list* head)
 	free(each);
 	each=NULL;
 	return 0;
-
 }
+
+
 int list_get_product_after_id(struct list* head, int id)
 {
 	int p=1,i=0;
@@ -110,6 +120,8 @@ int list_get_product_after_id(struct list* head, int id)
 	}
 	return p;
 }
+
+// 获取array的第id个元素
 int list_get_by_id(struct list* head, int id)
 {
 	int i;
@@ -128,6 +140,8 @@ int list_get_by_id(struct list* head, int id)
 	}
 	return each->v;
 }
+
+// 打印array
 char* list_prints(struct list* head, char *s){
 	struct list* each = head;
 	strcpy(s,"");
@@ -143,6 +157,8 @@ char* list_prints(struct list* head, char *s){
 	}
 	return s;
 }
+
+// 向array中添加元素
 struct list* list_add(struct list* head, int v)
 {
 	struct list* each = head;
@@ -161,8 +177,15 @@ struct list* list_add(struct list* head, int v)
 	return head;
 }
 
+
+/* 
+ * 在符号表中加入一项 
+ *
+ * k: 标识符的种类为const，var或procedure
+ * 
+ */
 void enter(enum object k){
-	tx=tx+1;
+	tx=tx+1; // 改变符号表指针
 	strcpy(table[tx].name,id);
 	table[tx].kind=k;
 	switch(k)
@@ -191,6 +214,7 @@ void enter(enum object k){
 				table[tx].array_size=array_size;
 				dx += array_len(table[tx].array_size);
 			}else{
+				// dx为当前应分配的变量的相对地址，分配后要增加1
 				dx++;
 			}
 			break;
@@ -200,7 +224,13 @@ void enter(enum object k){
 		}
 }
 
-
+/* 
+ * 查找标识符在符号表中的位置，从tx开始倒序查找标识符
+ * 找到则返回在符号表中的位置，否则返回0
+ * 
+ * id:    要查找的名字
+ * tx:    当前符号表尾指针
+ */
 int position(char id[10])
 {
 	int i;
@@ -223,8 +253,8 @@ void printTable(int tofile)
 	printf("****************************************************************************************************************************************************\n");
 	printf("table:\n");
 	printf("%15s%15s%15s%15s%15s%15s%15s%15s%15s%15s\n", "name", "kind", "val", "val_d", "type", "adr", "size", "array", "array_dim", "array_size");
-    fprintf(ftable, "%15s%15s%15s%15s%15s%15s%15s%15s%15s%15s\n", "name", "kind", "val", "val_d", "type", "adr", "size", "array", "array_dim", "array_size");
-    for(i=0;i<=tx;i++)
+	fprintf(ftable, "%15s%15s%15s%15s%15s%15s%15s%15s%15s%15s\n", "name", "kind", "val", "val_d", "type", "adr", "size", "array", "array_dim", "array_size");
+	for(i=0;i<=tx;i++)
 	{
 		switch(table[i].kind)
 		{
@@ -259,7 +289,7 @@ void printTable(int tofile)
 		char ss[50];
 		list_prints(table[i].array_size,ss);
 		printf("%15s%15s%15d%15lf%15s%15d%15d%15d%15d%15s\n", table[i].name, kind, table[i].val, table[i].val_d, type, table[i].adr, table[i].size, table[i].array, table[i].array_dim, ss);
-        fprintf(ftable, "%15s%15s%15d%15lf%15s%15d%15d%15d%15d%15s\n", table[i].name, kind, table[i].val, table[i].val_d, type, table[i].adr, table[i].size, table[i].array, table[i].array_dim, ss);
-    }
+		fprintf(ftable, "%15s%15s%15d%15lf%15s%15d%15d%15d%15d%15s\n", table[i].name, kind, table[i].val, table[i].val_d, type, table[i].adr, table[i].size, table[i].array, table[i].array_dim, ss);
+	}
 	printf("****************************************************************************************************************************************************\n");
 }

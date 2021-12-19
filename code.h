@@ -2,31 +2,34 @@
 #define CXMAX 1000
 #define LOOPMAX 50
 
-int cx,cx1,cx2;
-int err;
+int cx,cx1,cx2;        // cx：代码指针，相当于p，虚拟机代码指针, 取值范围[0, cxmax-1]
+int err;               // 错误计数器
 
+// 虚拟机代码指令
 enum fct{lit,opr,lod,sto,cal,ini,jmp,jpc,ext};
 enum inloop{brk,ctn};
+// 虚拟机代码指令名称
 char *mnemonic[9]={"lit","opr","lod","sto","cal","ini","jmp","jpc", "ext"};
 
-FILE *fcode;
-FILE *ferrout,*fresult;
-FILE *fin,*fout;
+FILE *fcode;             // 输出符号表
+FILE *ferrout;           // 输出文件及出错示意（如有错）、各行对应的生成代码首地址（如无错）
+FILE *fresult;           // 输出执行结果
+FILE *fin;               // 输入源文件
 char fname[AL];
 
 enum listswitcher{false,true};
 enum listswitcher listswitch;
 
 struct instruction{
-	enum fct f;
-	int l;
-	int a;
-	int isd;
-	double d;
+	enum fct f;             // 虚拟机代码指令
+	int l;                  // 引用层与声明层的层次差
+	int a;                  // 根据f的不同而不同
+	int isd;                // 是否是double类型
+	double d;               // double类型的值
 };
-struct instruction code[CXMAX+1];
+struct instruction code[CXMAX+1];  // 存放虚拟机代码的数组
 
-struct loop{
+struct loop{                       // 存放循环
 	int cx;
 	enum inloop type;
 	int level;
@@ -40,9 +43,9 @@ int pop_stack=0;
 int array_id=0;
 
 struct stack{
-	int vi;
-	double vd;
-	enum type_e type;
+	int vi;            // 元素的值
+	double vd;         // 元素的值
+	enum type_e type;  // 元素的类型
 };
 
 void error(int n){
@@ -69,6 +72,13 @@ void _gen(enum fct x,int y,int z,int isd,double d)
 	cx++;
 }
 
+/* 
+ * 生成虚拟机代码 
+ *
+ * x: instruction.f; 
+ * y: instruction.l; 
+ * z: instruction.a;
+ */
 void gen(enum fct x,int y,int z)
 {
 	_gen(x,y,z,0,0.0);
@@ -81,16 +91,17 @@ void listcode( )
 		printf("****************************************************************************************************************************************************\n");
 		printf("pcode:\n");
 		printf("%15s %15s %15s %15s %15s %15s\n","id","f","l","a","isd","d");
-        fprintf(fcode, "%15s %15s %15s %15s %15s %15s\n","id","f","l","a","isd","d");
+		fprintf(fcode, "%15s %15s %15s %15s\n","id","f","l","a");
 		for(i=0;i<=cx-1;i++){
 			printf("%15d %15s %15d %15d %15d %15lf\n",i,mnemonic[(int)code[i].f],code[i].l,code[i].a,code[i].isd,code[i].d);
-            fprintf(fcode, "%15d %15s %15d %15d %15d %15lf\n",i,mnemonic[(int)code[i].f],code[i].l,code[i].a,code[i].isd,code[i].d);
-			}
+			fprintf(fcode, "%15d %15s %15d %15d %15d %15lf\n",i,mnemonic[(int)code[i].f],code[i].l,code[i].a);
+		}
 		printf("****************************************************************************************************************************************************\n");
 	}
 }
 
 
+// 通过过程基址求上l层过程的基址
 int base(int l,int b,struct stack s[STACKSIZE])
 {
 	int b1;
@@ -102,21 +113,27 @@ int base(int l,int b,struct stack s[STACKSIZE])
 	return b1;
 }
 
+/*
+ * 解释程序 
+ */
 void interpret()
 {
-	int p=0;
-	int b=0;
-	int t=0;
-	struct instruction i;
+	int p=0;  // 指令指针
+	int b=0;  // 指令基址
+	int t=0;  // 栈顶指针
+	struct instruction i; // 存放当前指令
 	/*int s[STACKSIZE];*/
-	struct stack s[STACKSIZE];
+	struct stack s[STACKSIZE]; // 栈
 	printf("********Start X0*********\n");
- 	//fprintf(ferrout,"********Start PL/0*********\n");
+ 	// fprintf(ferrout,"********Start PL/0*********\n");
+	// s[0]不用
 	s[0].vi=0;s[0].vd=0.0;s[0].type=int_t;
+	// 主程序的三个联系单元均置为0
 	s[1].vi=0;s[1].vd=0.0;s[1].type=int_t;
 	s[2].vi=0;s[2].vd=0.0;s[2].type=int_t;
 	s[3].vi=0;s[3].vd=0.0;s[3].type=int_t;
 	int ti=tx;
+	// 在栈中登记数组元素的类型
 	while(ti>=0){
 		if(table[ti].kind==variable){
 			if(table[ti].array){
@@ -144,10 +161,10 @@ void interpret()
 		ti--;
 	}
 	do{
-		i=code[p];
+		i=code[p];  // 读当前指令
 		p=p+1;
 		switch(i.f){
-			case lit:
+			case lit:  // 将常量a的值取到栈顶
 				t=t+1;
 				if(i.isd){
 					s[t].type=double_tt;
@@ -157,7 +174,7 @@ void interpret()
 					s[t].vi=i.a;
 				}
 				break;
-			case opr:
+			case opr:  // 数学、逻辑运算
 				switch(i.a){
 					case 0:
 						p=0;

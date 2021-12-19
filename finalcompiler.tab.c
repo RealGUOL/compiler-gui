@@ -922,10 +922,10 @@ yyreduce:
 
 case 1:
 {
-                        dx=3;
-                        procReg.tx0=tx;
-                        table[tx].adr=cx;
-                        gen(jmp,0,1);
+                        dx=3;             /* 三个空间用于存放静态链SL、动态链DL和返回地址RA  */
+                        procReg.tx0=tx;   /* 记录本层标识符的初始位置 */
+                        table[tx].adr=cx; /* 记录当前层代码的开始位置 */
+                        gen(jmp,0,1);     /* 产生跳转指令，跳转位置已知填1 */
                     ;
     break;}
 case 2:
@@ -933,19 +933,19 @@ case 2:
     break;}
 case 3:
 {
-                            code[table[procReg.tx0].adr].a=cx;
+                            code[table[procReg.tx0].adr].a=cx; /* 把前面生成的跳转语句的跳转位置改成当前位置 */
                             strcpy(table[procReg.tx0].name,"main");
                             table[procReg.tx0].kind=procedur;
                             table[procReg.tx0].type=none_t;
-                            table[procReg.tx0].adr=cx;
-                            table[procReg.tx0].size=dx;
-                            procReg.cx0=cx;
-                            gen(ini,0,dx);
+                            table[procReg.tx0].adr=cx;         /* 记录当前过程代码地址 */
+                            table[procReg.tx0].size=dx;        /* 声明部分中每增加一条声明都会给dx增加1，声明部分已经结束，dx就是当前过程数据的size */
+                            procReg.cx0=cx;                    /* 记录当前过程代码地址 */
+                            gen(ini,0,dx);                     /* 生成指令，此指令执行时在数据栈中为被调用的过程开辟dx个单元的数据区 */
                         ;
     break;}
 case 4:
 {
-                            gen(opr,0,0);
+                            gen(opr,0,0);                      /* 每个过程出口都要使用的释放数据段指令 */
                         ;
     break;}
 case 5:
